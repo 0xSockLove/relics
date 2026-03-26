@@ -1,0 +1,51 @@
+name: CI
+
+permissions: {}
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+env:
+  FOUNDRY_PROFILE: ci
+  FOUNDRY_FUZZ_SEED: 0x1337
+
+jobs:
+  check:
+    name: SockLove Relics
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          cache: true
+
+      - name: Show Forge version
+        run: forge --version
+
+      - name: Run Forge fmt
+        run: forge fmt --check
+
+      - name: Run Forge build
+        run: forge build --sizes --deny-warnings
+
+      - name: Run Forge tests
+        run: forge test -vvv
+
+      - name: Run Forge snapshot
+        run: forge snapshot --check --tolerance 5 || forge snapshot
+
+      - name: Run Forge coverage
+        run: forge coverage --report summary
+
+      - name: Add coverage to PR summary
+        if: github.event_name == 'pull_request'
+        run: forge coverage --report summary >> $GITHUB_STEP_SUMMARY

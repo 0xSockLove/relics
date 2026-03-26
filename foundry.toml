@@ -1,0 +1,28 @@
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc = "0.8.34"
+evm_version = "cancun"
+optimizer = true
+optimizer_runs = 1000
+via_ir = true
+bytecode_hash = "none"
+cbor_metadata = false
+auto_detect_solc = false
+verbosity = 3
+
+[profile.default.fuzz]
+runs = 10000
+seed = "0x1337"
+
+[profile.ci]
+optimizer = true
+optimizer_runs = 10000
+via_ir = true
+
+[profile.ci.fuzz]
+runs = 1000
+
+[dependencies]
+"@openzeppelin/contracts" = "5.6.1"
